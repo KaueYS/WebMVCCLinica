@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMVCClinica", "WebMVCClinica\WebMVCClinica.csproj", "{7C86AA71-8263-416B-BF85-B20393776488}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebMVCClinica", "WebMVCClinica\WebMVCClinica.csproj", "{7C86AA71-8263-416B-BF85-B20393776488}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Consoles", "Consoles", "{6D95D08A-B3E2-4999-9579-120F34CCEDFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulacaoConsole", "SimulacaoConsole\SimulacaoConsole.csproj", "{81E6C8A2-E13F-4937-BE9C-A40FAA054290}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{7C86AA71-8263-416B-BF85-B20393776488}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C86AA71-8263-416B-BF85-B20393776488}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C86AA71-8263-416B-BF85-B20393776488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E6C8A2-E13F-4937-BE9C-A40FAA054290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E6C8A2-E13F-4937-BE9C-A40FAA054290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E6C8A2-E13F-4937-BE9C-A40FAA054290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E6C8A2-E13F-4937-BE9C-A40FAA054290}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{81E6C8A2-E13F-4937-BE9C-A40FAA054290} = {6D95D08A-B3E2-4999-9579-120F34CCEDFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13000B58-B8F1-4E1E-B332-7E7BB84113C6}

@@ -1,4 +1,7 @@
-﻿namespace WebMVCClinica.Models
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
+namespace WebMVCClinica.Models
 {
     public class Paciente
     {
@@ -6,5 +9,7 @@
         public string Nome { get; set; }
         public string Documento { get; set; }
         public string Celular { get; set; }
+        [JsonIgnore]
+        public List<Agendamento> Agendamentos { get; set;}
     }
 }
