@@ -97,22 +97,32 @@ public class CoreController : ControllerBase
         profissionalParametroFinalAtendimentoVerpertino.Valor = "2023-01-13 17:00:00";
         profissionalParametroFinalAtendimentoVerpertino.ProfissionalId = 20;
 
-
-
-
-
         List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
         //DateTime lastHour = new DateTime(2023, 01, 13, 7, 00, 00);
         DateTime lastHour = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+        
+        
+        
+        DateTime inicio = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+        DateTime final = Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor);
+        var intervalo = 1;
 
-        for (int i = 8; i <= 18; i++)
+
+        for (DateTime i = inicio; i <= final; intervalo++)
         {
 
-            if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor) 
+            if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor)
                 && lastHour < Convert.ToDateTime(profissionalParametroInicioAtendimentoVespertino.Valor))
             {
+
                 lastHour = lastHour.AddHours(1);
+
                 continue;
+            }
+            if (lastHour >= Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor))
+            {
+                agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
+                break;
             }
 
 

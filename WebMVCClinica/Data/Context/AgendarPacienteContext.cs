@@ -11,5 +11,7 @@ namespace WebMVCClinica.Data.Context
 
         public DbSet <Agendamento> AGENDAMENTOS { get; set; }
         public DbSet <Paciente> PACIENTES { get; set; }
+        public DbSet<Profissional> PROFISSIONAIS { get;set; }
+        public DbSet<ProfissionalParametro> PROFISSIONAISPARAMETROS { get; set; }
     }
 }
