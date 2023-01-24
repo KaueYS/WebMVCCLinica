@@ -98,11 +98,11 @@ public class CoreController : ControllerBase
         profissionalParametroFinalAtendimentoVerpertino.ProfissionalId = 20;
 
         List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
-        //DateTime lastHour = new DateTime(2023, 01, 13, 7, 00, 00);
+
         DateTime lastHour = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
-        
-        
-        
+
+
+
         DateTime inicio = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
         DateTime final = Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor);
         var intervalo = 1;
@@ -146,6 +146,7 @@ public class CoreController : ControllerBase
 
     }
 }
+
 //==============================================
 //1 - Criar tabela Profissional (Id, nome)
 // 2 - Tabela Profissional (Parametro -  ) 1--> N
