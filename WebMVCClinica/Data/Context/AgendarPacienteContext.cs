@@ -13,5 +13,7 @@ namespace WebMVCClinica.Data.Context
         public DbSet <Paciente> PACIENTES { get; set; }
         public DbSet<Profissional> PROFISSIONAIS { get;set; }
         public DbSet<ProfissionalParametro> PROFISSIONAISPARAMETROS { get; set; }
+        public DbSet<Especialidade> ESPECIALIDADES { get; set;}
+        public DbSet<ProfisisonalEspecialidade> PROFISSIONALESPECIALIDADES { get; set; }
     }
 }

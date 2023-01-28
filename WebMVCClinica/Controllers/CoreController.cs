@@ -68,71 +68,115 @@ public class CoreController : ControllerBase
         return Ok(pacientes);
     }
 
-
     [HttpPost]
     public ActionResult ConsultarHorarioDisponivel(
         [FromBody] AgendamentoDisponibilidadeConsultarViewModel agendamentoDisponibilidadeConsultarViewModel)
     {
-        ProfissionalParametro profissionalParametroInicioAtendimentoMatutino = new ProfissionalParametro();
-        profissionalParametroInicioAtendimentoMatutino.Id = 1;
-        profissionalParametroInicioAtendimentoMatutino.Nome = "InicioAtendimentoMatutino";
-        profissionalParametroInicioAtendimentoMatutino.Valor = "2023-01-13 09:00:00";
-        profissionalParametroInicioAtendimentoMatutino.ProfissionalId = 20;
+        //==============================================================================================================//
+        List<ProfissionalParametro> profissionalParamentros = _context.PROFISSIONAISPARAMETROS.ToList();
 
-        ProfissionalParametro profissionalParametroFinalAtendimentoMatutino = new ProfissionalParametro();
-        profissionalParametroFinalAtendimentoMatutino.Id = 2;
-        profissionalParametroFinalAtendimentoMatutino.Nome = "FinalAtendimentoMatutino";
-        profissionalParametroFinalAtendimentoMatutino.Valor = "2023-01-13 11:00:00";
-        profissionalParametroFinalAtendimentoMatutino.ProfissionalId = 20;
+        ProfissionalParametro profissionalParametroInicioAtendimentoMatutino = profissionalParamentros.Find
+            (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_MATUTINO);
 
-        ProfissionalParametro profissionalParametroInicioAtendimentoVespertino = new ProfissionalParametro();
-        profissionalParametroInicioAtendimentoVespertino.Id = 3;
-        profissionalParametroInicioAtendimentoVespertino.Nome = "InicioAtendimentoVespertino";
-        profissionalParametroInicioAtendimentoVespertino.Valor = "2023-01-13 13:00:00";
-        profissionalParametroInicioAtendimentoVespertino.ProfissionalId = 20;
+        ProfissionalParametro profissionalParametroFinalAtendimentoMatutino = profissionalParamentros.Find
+            (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_MATUTINO);
 
-        ProfissionalParametro profissionalParametroFinalAtendimentoVerpertino = new ProfissionalParametro();
-        profissionalParametroFinalAtendimentoVerpertino.Id = 4;
-        profissionalParametroFinalAtendimentoVerpertino.Nome = "FinalAtendimentoVespertino";
-        profissionalParametroFinalAtendimentoVerpertino.Valor = "2023-01-13 17:00:00";
-        profissionalParametroFinalAtendimentoVerpertino.ProfissionalId = 20;
+        ProfissionalParametro profissionalParametroInicioAtendimentoVespertino = profissionalParamentros.Find
+            (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_VERPERTINO);
+
+        ProfissionalParametro profissionalParametroFinalAtendimentoVerpertino = profissionalParamentros.Find
+            (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_VERPERTINO);
+
+        //==============================================================================================================//
 
         List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
 
-        DateTime lastHour = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
 
+        DateTime horaInicioAtendimentoMatutino = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+        
+        DateTime horaFinalAtendiomentoMatutino = DateTime.Parse(profissionalParametroFinalAtendimentoMatutino.Valor);
 
+        DateTime horaInicioAtendimentoVerpertino = DateTime.Parse(profissionalParametroInicioAtendimentoVespertino.Valor);
 
-        DateTime inicio = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
-        DateTime final = Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor);
-        var intervalo = 1;
+        DateTime horaFinalAtendimentoVerpertino = DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor);
+        
+        DateTime inicio = agendamentoDisponibilidadeConsultarViewModel.Inicio;
+        
+        DateTime final = agendamentoDisponibilidadeConsultarViewModel.Fim;
+        
+        DateTime horaAtendimentoDisponivel = new DateTime(inicio.Year, inicio.Month, inicio.Day, horaInicioAtendimentoMatutino.Hour, horaInicioAtendimentoMatutino.Minute, horaInicioAtendimentoMatutino.Second);
+        
 
-
-        for (DateTime i = inicio; i <= final; intervalo++)
+        while (horaAtendimentoDisponivel.Date <= final.Date)
         {
-
-            if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor)
-                && lastHour < Convert.ToDateTime(profissionalParametroInicioAtendimentoVespertino.Valor))
+            if(horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoMatutino.TimeOfDay)
             {
-
-                lastHour = lastHour.AddHours(1);
-
+                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
                 continue;
             }
-            if (lastHour >= Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor))
+            if(horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendiomentoMatutino.TimeOfDay && horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoVerpertino.TimeOfDay)
             {
-                agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
-                break;
+                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
+                continue;
             }
-
-
-            agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
-            lastHour = lastHour.AddHours(1);
+            if(horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendimentoVerpertino.TimeOfDay)
+            {
+                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
+                continue;
+            }
+            agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = horaAtendimentoDisponivel });
+            horaAtendimentoDisponivel= horaAtendimentoDisponivel.AddHours(1);
         }
+
+
+
+
+
+
+
+
+
+
+
+        //if (inicio >= lastHour)
+        //{
+        //    lastHour = new DateTime(inicio.Year, inicio.Month, inicio.Day, lastHour.Hour, lastHour.Minute, lastHour.Second);
+        //    // lastHour passou a receber a data que o usuario digitou + o horario do BANCO
+        //}
+
+        //while (inicio <= final)
+        //{
+        //    if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor) // 11
+        //        // lastHour 13/01/2023 maior que 31-12-2023? nao
+        //        && lastHour < Convert.ToDateTime(profissionalParametroInicioAtendimentoVespertino.Valor)) // 13
+        //    // lastHour 13/01/2023 menor que 01/01/2023? nao
+
+        //    {
+        //        lastHour = lastHour.AddHours(1);
+        //        continue;
+        //    }
+        //    if (lastHour > DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor)) //  17
+        //    {
+        //        lastHour = lastHour.AddHours(1);
+        //        continue;
+        //    }
+
+        //    // DateTime horarioFinalBanco = DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor);
+
+        //    DateTime horarioFinalBanco = new DateTime(final.Year, final.Month, final.Day, horaFinalBD.Hour, horaFinalBD.Minute, horaFinalBD.Second);
+
+        //    if (lastHour >= horarioFinalBanco)
+        //    // lastHour 13/01/2023 maior 13/01/23
+        //    {
+        //        agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
+        //        break;
+        //    }
+        //    agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
+        //    lastHour = lastHour.AddHours(1);
+        //}
 
         List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS.AsNoTracking().ToList();
         List<DateTime> avaliableAppointments = new List<DateTime>();
-
         foreach (AgendamentoListaDiaTodoViewModel agendamentoListaDiaTodo in agendamentosDisponiveis)
         {
             Agendamento agendamento = scheduledAppointments.Find(x => x.Inicio == agendamentoListaDiaTodo.Start);
@@ -142,9 +186,78 @@ public class CoreController : ControllerBase
             }
         }
         return Ok(avaliableAppointments);
-
-
     }
+
+    //[HttpPost]
+    //public ActionResult ConsultarHorarioDisponivel(
+    //    [FromBody] AgendamentoDisponibilidadeConsultarViewModel agendamentoDisponibilidadeConsultarViewModel)
+    //{
+    //    //==============================================================================================================//
+
+    //    ProfissionalParametro profissionalParametroInicioAtendimentoMatutino = new ProfissionalParametro();
+    //    profissionalParametroInicioAtendimentoMatutino.Id = 1;
+    //    profissionalParametroInicioAtendimentoMatutino.Nome = "InicioAtendimentoMatutino";
+    //    profissionalParametroInicioAtendimentoMatutino.Valor = "2023-01-13 09:00:00";
+    //    profissionalParametroInicioAtendimentoMatutino.ProfissionalId = 20;
+
+    //    ProfissionalParametro profissionalParametroFinalAtendimentoMatutino = new ProfissionalParametro();
+    //    profissionalParametroFinalAtendimentoMatutino.Id = 2;
+    //    profissionalParametroFinalAtendimentoMatutino.Nome = "FinalAtendimentoMatutino";
+    //    profissionalParametroFinalAtendimentoMatutino.Valor = "2023-01-13 11:00:00";
+    //    profissionalParametroFinalAtendimentoMatutino.ProfissionalId = 20;
+
+    //    ProfissionalParametro profissionalParametroInicioAtendimentoVespertino = new ProfissionalParametro();
+    //    profissionalParametroInicioAtendimentoVespertino.Id = 3;
+    //    profissionalParametroInicioAtendimentoVespertino.Nome = "InicioAtendimentoVespertino";
+    //    profissionalParametroInicioAtendimentoVespertino.Valor = "2023-01-13 13:00:00";
+    //    profissionalParametroInicioAtendimentoVespertino.ProfissionalId = 20;
+
+    //    ProfissionalParametro profissionalParametroFinalAtendimentoVerpertino = new ProfissionalParametro();
+    //    profissionalParametroFinalAtendimentoVerpertino.Id = 4;
+    //    profissionalParametroFinalAtendimentoVerpertino.Nome = "FinalAtendimentoVespertino";
+    //    profissionalParametroFinalAtendimentoVerpertino.Valor = "2023-01-13 17:00:00";
+    //    profissionalParametroFinalAtendimentoVerpertino.ProfissionalId = 20;
+
+    //    //==============================================================================================================//
+
+    //    List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
+
+    //    // variaveis do FOR
+    //    DateTime lastHour = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+    //    DateTime inicio = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+    //    DateTime final = Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor);
+
+
+    //    //for (DateTime i = inicio; i <= final; intervalo++)
+    //    while(inicio <= final)
+    //    {
+    //        if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor)
+    //            && lastHour < Convert.ToDateTime(profissionalParametroInicioAtendimentoVespertino.Valor))
+    //        {
+    //            lastHour = lastHour.AddHours(1);
+    //            continue;
+    //        }
+    //        if (lastHour >= Convert.ToDateTime(profissionalParametroFinalAtendimentoVerpertino.Valor))
+    //        {
+    //            agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
+    //            break;
+    //        }
+    //        agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
+    //        lastHour = lastHour.AddHours(1);
+    //    }
+
+    //    List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS.AsNoTracking().ToList();
+    //    List<DateTime> avaliableAppointments = new List<DateTime>();
+    //    foreach (AgendamentoListaDiaTodoViewModel agendamentoListaDiaTodo in agendamentosDisponiveis)
+    //    {
+    //        Agendamento agendamento = scheduledAppointments.Find(x => x.Inicio == agendamentoListaDiaTodo.Start);
+    //        if (agendamento is null)
+    //        {
+    //            avaliableAppointments.Add(agendamentoListaDiaTodo.Start);
+    //        }
+    //    }
+    //    return Ok(avaliableAppointments);
+    //}
 }
 
 //==============================================

@@ -4,6 +4,8 @@ namespace WebMVCClinica.ViewModels
 {
     public class AgendamentoDisponibilidadeConsultarViewModel
     {
-        public DateTime Data { get; set; }
+        public DateTime Inicio { get; set; }
+        public DateTime Fim { get; set; }
+        public int EspecialidadeId { get; set; }
     }
 }
