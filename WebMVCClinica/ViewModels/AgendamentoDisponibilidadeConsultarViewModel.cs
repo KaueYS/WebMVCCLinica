@@ -6,6 +6,6 @@ namespace WebMVCClinica.ViewModels
     {
         public DateTime Inicio { get; set; }
         public DateTime Fim { get; set; }
-        public int EspecialidadeId { get; set; }
+        public int? EspecialidadeId { get; set; }
     }
 }

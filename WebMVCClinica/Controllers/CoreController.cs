@@ -6,6 +6,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using WebMVCClinica.Data.Context;
+using WebMVCClinica.Migrations;
 using WebMVCClinica.Models;
 using WebMVCClinica.ViewModels;
 
@@ -128,54 +129,22 @@ public class CoreController : ControllerBase
             horaAtendimentoDisponivel= horaAtendimentoDisponivel.AddHours(1);
         }
 
+        
+
+        //Filtro na Tabela 
+        List<ProfisisonalEspecialidade> profissionaisEspecialidade = _context.PROFISSIONALESPECIALIDADES
+            .Where(x => x.EspecialidadeId == agendamentoDisponibilidadeConsultarViewModel.EspecialidadeId).ToList();
+
+        List<int> profissionaisId = profissionaisEspecialidade.Select(x => x.ProfissionalId).ToList();
+
+        List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS
+            .Where(x => x.Inicio.Date >= agendamentoDisponibilidadeConsultarViewModel.Inicio.Date 
+            && x.Termino.Date <= agendamentoDisponibilidadeConsultarViewModel.Fim.Date
+            && profissionaisId.Contains(x.ProfissionalId)).ToList();
+            
+        
 
 
-
-
-
-
-
-
-
-
-        //if (inicio >= lastHour)
-        //{
-        //    lastHour = new DateTime(inicio.Year, inicio.Month, inicio.Day, lastHour.Hour, lastHour.Minute, lastHour.Second);
-        //    // lastHour passou a receber a data que o usuario digitou + o horario do BANCO
-        //}
-
-        //while (inicio <= final)
-        //{
-        //    if (lastHour > Convert.ToDateTime(profissionalParametroFinalAtendimentoMatutino.Valor) // 11
-        //        // lastHour 13/01/2023 maior que 31-12-2023? nao
-        //        && lastHour < Convert.ToDateTime(profissionalParametroInicioAtendimentoVespertino.Valor)) // 13
-        //    // lastHour 13/01/2023 menor que 01/01/2023? nao
-
-        //    {
-        //        lastHour = lastHour.AddHours(1);
-        //        continue;
-        //    }
-        //    if (lastHour > DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor)) //  17
-        //    {
-        //        lastHour = lastHour.AddHours(1);
-        //        continue;
-        //    }
-
-        //    // DateTime horarioFinalBanco = DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor);
-
-        //    DateTime horarioFinalBanco = new DateTime(final.Year, final.Month, final.Day, horaFinalBD.Hour, horaFinalBD.Minute, horaFinalBD.Second);
-
-        //    if (lastHour >= horarioFinalBanco)
-        //    // lastHour 13/01/2023 maior 13/01/23
-        //    {
-        //        agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
-        //        break;
-        //    }
-        //    agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = lastHour });
-        //    lastHour = lastHour.AddHours(1);
-        //}
-
-        List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS.AsNoTracking().ToList();
         List<DateTime> avaliableAppointments = new List<DateTime>();
         foreach (AgendamentoListaDiaTodoViewModel agendamentoListaDiaTodo in agendamentosDisponiveis)
         {

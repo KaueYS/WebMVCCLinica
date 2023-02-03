@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMVCClinica.Data.Context;
 
@@ -11,9 +12,11 @@ using WebMVCClinica.Data.Context;
 namespace WebMVCClinica.Migrations
 {
     [DbContext(typeof(AgendarPacienteContext))]
-    partial class AgendarPacienteContextModelSnapshot : ModelSnapshot
+    [Migration("20230131213722_ProfissionaEspecialidades")]
+    partial class ProfissionaEspecialidades
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,17 +39,12 @@ namespace WebMVCClinica.Migrations
                     b.Property<int>("PacienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfissionalId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Termino")
                         .HasColumnType("datetime2");
 
                     b.HasKey("AgendamentoId");
 
                     b.HasIndex("PacienteId");
-
-                    b.HasIndex("ProfissionalId");
 
                     b.ToTable("AGENDAMENTOS");
                 });
@@ -62,7 +60,12 @@ namespace WebMVCClinica.Migrations
                     b.Property<string>("Descricao")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ProfisisonalEspecialidadeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProfisisonalEspecialidadeId");
 
                     b.ToTable("ESPECIALIDADES");
                 });
@@ -97,15 +100,10 @@ namespace WebMVCClinica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EspecialidadeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProfissionalId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EspecialidadeId");
 
                     b.HasIndex("ProfissionalId");
 
@@ -160,32 +158,23 @@ namespace WebMVCClinica.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebMVCClinica.Models.Profissional", "Profissional")
-                        .WithMany()
-                        .HasForeignKey("ProfissionalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Paciente");
+                });
 
-                    b.Navigation("Profissional");
+            modelBuilder.Entity("WebMVCClinica.Models.Especialidade", b =>
+                {
+                    b.HasOne("WebMVCClinica.Models.ProfisisonalEspecialidade", null)
+                        .WithMany("Especialidades")
+                        .HasForeignKey("ProfisisonalEspecialidadeId");
                 });
 
             modelBuilder.Entity("WebMVCClinica.Models.ProfisisonalEspecialidade", b =>
                 {
-                    b.HasOne("WebMVCClinica.Models.Especialidade", "Especialidade")
-                        .WithMany()
-                        .HasForeignKey("EspecialidadeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebMVCClinica.Models.Profissional", "Profissional")
                         .WithMany()
                         .HasForeignKey("ProfissionalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Especialidade");
 
                     b.Navigation("Profissional");
                 });
@@ -204,6 +193,11 @@ namespace WebMVCClinica.Migrations
             modelBuilder.Entity("WebMVCClinica.Models.Paciente", b =>
                 {
                     b.Navigation("Agendamentos");
+                });
+
+            modelBuilder.Entity("WebMVCClinica.Models.ProfisisonalEspecialidade", b =>
+                {
+                    b.Navigation("Especialidades");
                 });
 
             modelBuilder.Entity("WebMVCClinica.Models.Profissional", b =>

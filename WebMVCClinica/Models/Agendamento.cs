@@ -24,6 +24,8 @@ namespace WebMVCClinica.Models
         public int AgendamentoId { get; set; }
         public DateTime Inicio { get; set; }
         public DateTime Termino { get; set; }
+        public Profissional Profissional { get; set; }
+        public int ProfissionalId { get; set; }
 
         [JsonIgnore]
         public Paciente Paciente { get; set; }

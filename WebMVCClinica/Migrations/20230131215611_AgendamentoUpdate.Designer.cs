@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMVCClinica.Data.Context;
 
@@ -11,9 +12,11 @@ using WebMVCClinica.Data.Context;
 namespace WebMVCClinica.Migrations
 {
     [DbContext(typeof(AgendarPacienteContext))]
-    partial class AgendarPacienteContextModelSnapshot : ModelSnapshot
+    [Migration("20230131215611_AgendamentoUpdate")]
+    partial class AgendamentoUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,10 @@ namespace WebMVCClinica.Migrations
                     b.Property<int>("PacienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfissionalId")
+                    b.Property<int>("ProfissionaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProfissionalId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Termino")
@@ -162,9 +168,7 @@ namespace WebMVCClinica.Migrations
 
                     b.HasOne("WebMVCClinica.Models.Profissional", "Profissional")
                         .WithMany()
-                        .HasForeignKey("ProfissionalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProfissionalId");
 
                     b.Navigation("Paciente");
 
