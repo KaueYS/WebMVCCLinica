@@ -72,89 +72,97 @@ public class CoreController : ControllerBase
     [HttpPost]
     public ActionResult ConsultarHorarioDisponivel(
         [FromBody] AgendamentoDisponibilidadeConsultarViewModel agendamentoDisponibilidadeConsultarViewModel)
+
     {
-        //==============================================================================================================//
         List<ProfissionalParametro> profissionalParamentros = _context.PROFISSIONAISPARAMETROS.ToList();
 
-        ProfissionalParametro profissionalParametroInicioAtendimentoMatutino = profissionalParamentros.Find
-            (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_MATUTINO);
-
-        ProfissionalParametro profissionalParametroFinalAtendimentoMatutino = profissionalParamentros.Find
-            (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_MATUTINO);
-
-        ProfissionalParametro profissionalParametroInicioAtendimentoVespertino = profissionalParamentros.Find
-            (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_VERPERTINO);
-
-        ProfissionalParametro profissionalParametroFinalAtendimentoVerpertino = profissionalParamentros.Find
-            (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_VERPERTINO);
-
-        //==============================================================================================================//
-
-        List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
-
-
-        DateTime horaInicioAtendimentoMatutino = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
-        
-        DateTime horaFinalAtendiomentoMatutino = DateTime.Parse(profissionalParametroFinalAtendimentoMatutino.Valor);
-
-        DateTime horaInicioAtendimentoVerpertino = DateTime.Parse(profissionalParametroInicioAtendimentoVespertino.Valor);
-
-        DateTime horaFinalAtendimentoVerpertino = DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor);
-        
-        DateTime inicio = agendamentoDisponibilidadeConsultarViewModel.Inicio;
-        
-        DateTime final = agendamentoDisponibilidadeConsultarViewModel.Fim;
-        
-        DateTime horaAtendimentoDisponivel = new DateTime(inicio.Year, inicio.Month, inicio.Day, horaInicioAtendimentoMatutino.Hour, horaInicioAtendimentoMatutino.Minute, horaInicioAtendimentoMatutino.Second);
-        
-
-        while (horaAtendimentoDisponivel.Date <= final.Date)
-        {
-            if(horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoMatutino.TimeOfDay)
-            {
-                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
-                continue;
-            }
-            if(horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendiomentoMatutino.TimeOfDay && horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoVerpertino.TimeOfDay)
-            {
-                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
-                continue;
-            }
-            if(horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendimentoVerpertino.TimeOfDay)
-            {
-                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
-                continue;
-            }
-            agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = horaAtendimentoDisponivel });
-            horaAtendimentoDisponivel= horaAtendimentoDisponivel.AddHours(1);
-        }
-
-        
-
-        //Filtro na Tabela 
         List<ProfisisonalEspecialidade> profissionaisEspecialidade = _context.PROFISSIONALESPECIALIDADES
             .Where(x => x.EspecialidadeId == agendamentoDisponibilidadeConsultarViewModel.EspecialidadeId).ToList();
+        
+        List<AgendamentoDisponibilidadeEspecialidadeViewModel> agendamentoDisponibilidadeEspecialidades = new List<AgendamentoDisponibilidadeEspecialidadeViewModel>();
 
         List<int> profissionaisId = profissionaisEspecialidade.Select(x => x.ProfissionalId).ToList();
 
-        List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS
-            .Where(x => x.Inicio.Date >= agendamentoDisponibilidadeConsultarViewModel.Inicio.Date 
-            && x.Termino.Date <= agendamentoDisponibilidadeConsultarViewModel.Fim.Date
-            && profissionaisId.Contains(x.ProfissionalId)).ToList();
-            
-        
+        List<Profissional> profissionais = _context.PROFISSIONAIS.ToList();
 
-
-        List<DateTime> avaliableAppointments = new List<DateTime>();
-        foreach (AgendamentoListaDiaTodoViewModel agendamentoListaDiaTodo in agendamentosDisponiveis)
+        foreach (int profissionalId in profissionaisId)
         {
-            Agendamento agendamento = scheduledAppointments.Find(x => x.Inicio == agendamentoListaDiaTodo.Start);
-            if (agendamento is null)
+
+            ProfissionalParametro profissionalParametroInicioAtendimentoMatutino = profissionalParamentros.Find
+                (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_MATUTINO && x.ProfissionalId == profissionalId);
+
+            ProfissionalParametro profissionalParametroFinalAtendimentoMatutino = profissionalParamentros.Find
+                (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_MATUTINO && x.ProfissionalId == profissionalId);
+
+            ProfissionalParametro profissionalParametroInicioAtendimentoVespertino = profissionalParamentros.Find
+                (x => x.Nome == ProfissionalParametroConstantes.INICIO_ATENDIMENTO_VERPERTINO && x.ProfissionalId == profissionalId);
+
+            ProfissionalParametro profissionalParametroFinalAtendimentoVerpertino = profissionalParamentros.Find
+                (x => x.Nome == ProfissionalParametroConstantes.FINAL_ATENDIMENTO_VERPERTINO && x.ProfissionalId == profissionalId);
+
+            List<AgendamentoListaDiaTodoViewModel> agendamentosDisponiveis = new List<AgendamentoListaDiaTodoViewModel>();
+
+            DateTime horaInicioAtendimentoMatutino = Convert.ToDateTime(profissionalParametroInicioAtendimentoMatutino.Valor);
+
+            DateTime horaFinalAtendiomentoMatutino = DateTime.Parse(profissionalParametroFinalAtendimentoMatutino.Valor);
+
+            DateTime horaInicioAtendimentoVerpertino = DateTime.Parse(profissionalParametroInicioAtendimentoVespertino.Valor);
+
+            DateTime horaFinalAtendimentoVerpertino = DateTime.Parse(profissionalParametroFinalAtendimentoVerpertino.Valor);
+
+            DateTime inicio = agendamentoDisponibilidadeConsultarViewModel.Inicio;
+
+            DateTime final = agendamentoDisponibilidadeConsultarViewModel.Fim;
+
+            DateTime horaAtendimentoDisponivel = new DateTime(inicio.Year, inicio.Month, inicio.Day, horaInicioAtendimentoMatutino.Hour, horaInicioAtendimentoMatutino.Minute, horaInicioAtendimentoMatutino.Second);
+
+            while (horaAtendimentoDisponivel.Date <= final.Date)
             {
-                avaliableAppointments.Add(agendamentoListaDiaTodo.Start);
+                if (horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoMatutino.TimeOfDay)
+                {
+                    horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
+                    continue;
+                }
+                if (horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendiomentoMatutino.TimeOfDay && horaAtendimentoDisponivel.TimeOfDay < horaInicioAtendimentoVerpertino.TimeOfDay)
+                {
+                    horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
+                    continue;
+                }
+                if (horaAtendimentoDisponivel.TimeOfDay > horaFinalAtendimentoVerpertino.TimeOfDay)
+                {
+                    horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
+                    continue;
+                }
+                agendamentosDisponiveis.Add(new AgendamentoListaDiaTodoViewModel { Start = horaAtendimentoDisponivel });
+                horaAtendimentoDisponivel = horaAtendimentoDisponivel.AddHours(1);
             }
+
+            List<Agendamento> scheduledAppointments = _context.AGENDAMENTOS
+                .Where(x => x.Inicio.Date >= agendamentoDisponibilidadeConsultarViewModel.Inicio.Date
+                && x.Termino.Date <= agendamentoDisponibilidadeConsultarViewModel.Fim.Date
+                && x.ProfissionalId == profissionalId).ToList();
+
+            List<DateTime> avaliableAppointments = new List<DateTime>();
+
+            foreach (AgendamentoListaDiaTodoViewModel agendamentoListaDiaTodo in agendamentosDisponiveis)
+            {
+                Agendamento agendamento = scheduledAppointments.Find(x => x.Inicio == agendamentoListaDiaTodo.Start);
+                if (agendamento is null)
+                {
+                    avaliableAppointments.Add(agendamentoListaDiaTodo.Start);
+                }
+            }
+
+            Profissional profissional = profissionais.Find(x => x.Id == profissionalId);
+
+            AgendamentoDisponibilidadeEspecialidadeViewModel agendamentoDisponibilidadeEspecialidade = new AgendamentoDisponibilidadeEspecialidadeViewModel();
+            agendamentoDisponibilidadeEspecialidade.Profissional = profissional;
+            agendamentoDisponibilidadeEspecialidade.Disponibilidade = avaliableAppointments;
+            agendamentoDisponibilidadeEspecialidades.Add(agendamentoDisponibilidadeEspecialidade);
+
+
         }
-        return Ok(avaliableAppointments);
+        return Ok(agendamentoDisponibilidadeEspecialidades);
     }
 
     //[HttpPost]
