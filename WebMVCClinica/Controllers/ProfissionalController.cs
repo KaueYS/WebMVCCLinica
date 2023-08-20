@@ -8,17 +8,14 @@ using WebMVCClinica.ViewModels;
 namespace WebMVCClinica.Controllers
 {
     [Route("/api/[controller]/[action]")]
-    public class ProfissionaisController : Controller
+    public class ProfissionalController : Controller
     {
         private readonly AgendarPacienteContext _context;
 
-        public ProfissionaisController(AgendarPacienteContext context)
+        public ProfissionalController(AgendarPacienteContext context)
         {
             _context = context;
         }
-
-
-
 
         [HttpGet]
         public IActionResult Get()

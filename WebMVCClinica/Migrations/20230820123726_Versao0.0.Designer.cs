@@ -12,8 +12,8 @@ using WebMVCClinica.Data.Context;
 namespace WebMVCClinica.Migrations
 {
     [DbContext(typeof(AgendarPacienteContext))]
-    [Migration("20230131215611_AgendamentoUpdate")]
-    partial class AgendamentoUpdate
+    [Migration("20230820123726_Versao0.0")]
+    partial class Versao00
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,10 +39,7 @@ namespace WebMVCClinica.Migrations
                     b.Property<int>("PacienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfissionaId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProfissionalId")
+                    b.Property<int>("ProfissionalId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Termino")
@@ -168,7 +165,9 @@ namespace WebMVCClinica.Migrations
 
                     b.HasOne("WebMVCClinica.Models.Profissional", "Profissional")
                         .WithMany()
-                        .HasForeignKey("ProfissionalId");
+                        .HasForeignKey("ProfissionalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Paciente");
 

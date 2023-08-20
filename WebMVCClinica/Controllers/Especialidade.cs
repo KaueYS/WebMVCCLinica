@@ -8,11 +8,11 @@ using WebMVCClinica.ViewModels;
 namespace WebMVCClinica.Controllers
 {
     [Route("/api/[controller]/[action]")]
-    public class Especialidades : ControllerBase
+    public class Especialidade : ControllerBase
     {
         private readonly AgendarPacienteContext _context;
 
-        public Especialidades(AgendarPacienteContext context)
+        public Especialidade(AgendarPacienteContext context)
         {
             _context = context;
         }
@@ -21,7 +21,7 @@ namespace WebMVCClinica.Controllers
         public IActionResult Post(
             [FromBody] EspecialidadeViewModel model)
         {
-            Especialidade especialidade = new Especialidade
+            Models.Especialidade especialidade = new Models.Especialidade
             {
                 Id = model.Id,
                 Descricao= model.Descricao,

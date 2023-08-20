@@ -7,11 +7,11 @@ using WebMVCClinica.ViewModels;
 namespace WebMVCClinica.Controllers
 {
     [Route("/api/[controller]/[action]")]
-    public class ProfissionalParametrosController : Controller
+    public class ProfissionalParametroController : Controller
     {
         private readonly AgendarPacienteContext _context;
 
-        public ProfissionalParametrosController(AgendarPacienteContext context)
+        public ProfissionalParametroController(AgendarPacienteContext context)
         {
             _context = context;
         }
